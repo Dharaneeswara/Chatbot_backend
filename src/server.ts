@@ -5,11 +5,13 @@ import { setupAssociations } from "./models/associations.js";
 import { connectRedis } from "./config/redis.js";
 import { redisClient } from "./config/redis.js";
 
-
 const startServer = async () => {
   try {
     await db_connection();
-    await connectRedis();
+    // await connectRedis();
+    if (process.env.REDIS_URL) {
+      await connectRedis();
+    }
     setupAssociations();
 
     app.listen(env.PORT, (err) => {
@@ -25,5 +27,3 @@ const startServer = async () => {
   }
 };
 startServer();
-
-
