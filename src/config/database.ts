@@ -1,10 +1,14 @@
 import { Sequelize } from "sequelize";
 import { env } from "./env.js";
 
-export const sequelize = new Sequelize(env.DB_NAME, env.DB_USER, env.DB_PASSWORD, {
-  host: env.DB_HOST,
-  port: Number(env.DB_PORT),
-  dialect: env.DB_DIALECT,
+// export const sequelize = new Sequelize(env.DB_NAME, env.DB_USER, env.DB_PASSWORD, {
+//   host: env.DB_HOST,
+//   port: Number(env.DB_PORT),
+//   dialect: env.DB_DIALECT,
+//   logging: false,
+// });
+export const sequelize = new Sequelize(process.env.DB_URL as string, {
+  dialect: "mysql",
   logging: false,
 });
 
