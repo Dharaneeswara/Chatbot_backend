@@ -4,7 +4,6 @@ import { PermissionService } from "../services/permissionService.js";
 const permissionService = new PermissionService();
 
 export class PermissionController {
-
   async getAllPermissions(req: Request, res: Response) {
     try {
       const permissions = await permissionService.getAllPermissions();
@@ -39,7 +38,12 @@ export class PermissionController {
   async assignPermission(req: Request, res: Response) {
     try {
       const { roleId, permissionName } = req.body;
-      await permissionService.assignPermissionToRole(roleId, permissionName);
+      const requesterRoles = (req as any).user?.roles || [];
+      await permissionService.assignPermissionToRole(
+        roleId,
+        permissionName,
+        requesterRoles,
+      );
       res.status(200).json({
         success: true,
         message: `Permission "${permissionName}" assigned to role ${roleId} successfully`,
@@ -55,7 +59,12 @@ export class PermissionController {
   async removePermission(req: Request, res: Response) {
     try {
       const { roleId, permissionName } = req.body;
-      await permissionService.removePermissionFromRole(roleId, permissionName);
+      const requesterRoles = (req as any).user?.roles || [];
+      await permissionService.removePermissionFromRole(
+        roleId,
+        permissionName,
+        requesterRoles,
+      );
       res.status(200).json({
         success: true,
         message: `Permission "${permissionName}" removed from role successfully`,

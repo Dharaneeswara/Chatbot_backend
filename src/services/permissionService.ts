@@ -5,7 +5,6 @@ const permissionRepo = new PermissionRepository();
 const roleRepo = new RoleRepository();
 
 export class PermissionService {
-
   async getAllPermissions() {
     return await permissionRepo.findAll();
   }
@@ -17,29 +16,49 @@ export class PermissionService {
     return await permissionRepo.findPermissionsByRoleId(roleId);
   }
 
-  async assignPermissionToRole(roleId: number, permissionName: string) {
+  async assignPermissionToRole(
+    roleId: number,
+    permissionName: string,
+    requesterRoles: string[],
+  ) {
     const role = await roleRepo.findById(roleId);
     if (!role) throw new Error("Role not found");
+
+    if (role.roleName === "admin" && !requesterRoles.includes("admin")) {
+      throw new Error("Only admins can modify the admin role");
+    }
 
     const permission = await permissionRepo.findByName(permissionName);
     if (!permission) throw new Error("Permission not found");
 
     const existing = await permissionRepo.findPermissionsByRoleId(roleId);
     const alreadyAssigned = existing.some(
-      (rp: any) => rp.Permission?.name === permissionName
+      (rp: any) => rp.Permission?.name === permissionName,
     );
-    if (alreadyAssigned) throw new Error("Permission already assigned to this role");
+    if (alreadyAssigned)
+      throw new Error("Permission already assigned to this role");
 
     return await permissionRepo.assignPermissionToRole(role.id, permission.id);
   }
 
-  async removePermissionFromRole(roleId: number, permissionName: string) {
+  async removePermissionFromRole(
+    roleId: number,
+    permissionName: string,
+    requesterRoles: string[],
+  ) {
     const role = await roleRepo.findById(roleId);
     if (!role) throw new Error("Role not found");
+
+    if (role.roleName === "admin" && !requesterRoles.includes("admin")) {
+      throw new Error("Only admins can modify the admin role");
+    }
 
     const permission = await permissionRepo.findByName(permissionName);
     if (!permission) throw new Error("Permission not found");
 
-    return await permissionRepo.removePermissionFromRole(role.id, permission.id);
+    return await permissionRepo.removePermissionFromRole(
+      role.id,
+      permission.id,
+    );
   }
 }
